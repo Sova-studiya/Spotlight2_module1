@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My House 🏠 — Учим слова</title>
+<style>
+  /* ===== ОБЩИЕ СТИЛИ ===== */
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #fff8e7 0%, #ffe8d6 50%, #ffd6ba 100%);
+    color: #3a2e2a;
+    min-height: 100vh;
+    padding: 16px;
+    padding-bottom: 40px;
+    line-height: 1.4;
+  }
+  .app { max-width: 900px; margin: 0 auto; }
+
+  /* ===== ЗАГОЛОВОК ===== */
+  .title {
+    text-align: center;
+    font-size: clamp(28px, 6vw, 44px);
+    font-weight: 800;
+    color: #d35400;
+    margin: 8px 0 4px;
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(0,0,0,0.08);
+  }
+  .subtitle {
+    text-align: center;
+    font-size: clamp(16px, 3.5vw, 20px);
+    color: #7a5a4a;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  /* ===== МЕНЮ УРОВНЕЙ ===== */
+  .levels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .level-card {
+    background: #fff;
+    border: 3px solid #ffb347;
+    border-radius: 22px;
+    padding: 18px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 0 #e89a3c, 0 6px 12px rgba(0,0,0,0.08);
+    user-select: none;
+  }
+  .level-card:active { transform: translateY(2px); box-shadow: 0 2px 0 #e89a3c; }
+  .level-card:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #e89a3c, 0 8px 16px rgba(0,0,0,0.12); }
+  .level-num {
+    font-size: 42px;
+    font-weight: 900;
+    color: #d35400;
+    line-height: 1;
+  }
+  .level-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #3a2e2a;
+    margin-top: 6px;
+    min-height: 36px;
+  }
+  .level-stars {
+    margin-top: 8px;
+    font-size: 22px;
+    letter-spacing: 2px;
+  }
+  .star-empty { opacity: 0.25; }
+
+  /* ===== ЭКРАН УРОВНЯ ===== */
+  .screen { display: none; animation: fadeIn 0.25s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .btn-back {
+    background: #fff;
+    border: 3px solid #d35400;
+    color: #d35400;
+    font-weight: 800;
+    padding: 10px 18px;
+    border-radius: 16px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #a84400;
+  }
+  .btn-back:active { transform: translateY(2px); box-shadow: 0 1px 0 #a84400; }
+
+  .progress-info {
+    background: #fff;
+    border: 3px solid #4caf50;
+    border-radius: 16px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #2e7d32;
+  }
+  .score-info {
+    background: #fff;
+    border: 3px solid #f1c40f;
+    border-radius: 16px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 16px;
+    color: #b8860b;
+  }
+
+  .level-title {
+    text-align: center;
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 800;
+    color: #d35400;
+    margin: 10px 0 18px;
+  }
+
+  /* ===== УРОВЕНЬ 1: СЛОВАРИК ===== */
+  .vocab-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .btn {
+    background: #ff9f43;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 12px 22px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #d97706;
+    transition: transform 0.1s;
+  }
+  .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #d97706; }
+  .btn.secondary { background: #74b9ff; box-shadow: 0 4px 0 #3a86c9; }
+  .btn.secondary:active { box-shadow: 0 2px 0 #3a86c9; }
+  .btn.success { background: #55efc4; color: #0a6647; box-shadow: 0 4px 0 #2ecc71; }
+  .btn.success:active { box-shadow: 0 2px 0 #2ecc71; }
+  .btn.danger { background: #ff7675; box-shadow: 0 4px 0 #c0392b; }
+  .btn.danger:active { box-shadow: 0 2px 0 #c0392b; }
+
+  .vocab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .word-card {
+    background: #fff;
+    border: 3px solid #ffb347;
+    border-radius: 18px;
+    padding: 14px 10px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 3px 0 #e89a3c;
+  }
+  .word-emoji { font-size: 42px; line-height: 1; }
+  .word-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: #d35400;
+    margin: 6px 0 4px;
+    word-break: break-word;
+  }
+  .word-trans {
+    font-size: 15px;
+    color: #555;
+    font-weight: 600;
+    min-height: 20px;
+  }
+  .word-trans.hidden { visibility: hidden; }
+  .word-speak {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #74b9ff;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 2px 0 #3a86c9;
+  }
+  .word-speak:active { transform: translateY(1px); box-shadow: 0 1px 0 #3a86c9; }
+
+  /* ===== УРОВНИ 2–4: ВЫБОР ИЗ 4 ===== */
+  .question-box {
+    background: #fff;
+    border: 4px solid #d35400;
+    border-radius: 24px;
+    padding: 24px 16px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 0 #a84400;
+  }
+  .question-emoji { font-size: 64px; line-height: 1; }
+  .question-main {
+    font-size: clamp(28px, 7vw, 44px);
+    font-weight: 900;
+    color: #d35400;
+    margin: 10px 0;
+    word-break: break-word;
+  }
+  .question-sub {
+    font-size: 18px;
+    color: #7a5a4a;
+    font-weight: 600;
+    font-style: italic;
+  }
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .option-btn {
+    background: #fff;
+    border: 3px solid #74b9ff;
+    border-radius: 18px;
+    padding: 16px 10px;
+    font-size: clamp(16px, 4vw, 20px);
+    font-weight: 700;
+    color: #2d3436;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #3a86c9;
+    transition: transform 0.1s;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    word-break: break-word;
+  }
+  .option-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #3a86c9; }
+  .option-btn:disabled { cursor: default; }
+  .option-btn.correct {
+    background: #55efc4;
+    border-color: #00b894;
+    color: #0a6647;
+    box-shadow: 0 4px 0 #00896a;
+  }
+  .option-btn.wrong {
+    background: #ff7675;
+    border-color: #d63031;
+    color: #fff;
+    box-shadow: 0 4px 0 #a82424;
+  }
+  .option-btn .mark { font-weight: 900; margin-left: 6px; }
+
+  /* ===== УРОВЕНЬ 5: ПРОПУЩЕННАЯ БУКВА ===== */
+  .missing-word {
+    font-size: clamp(36px, 10vw, 60px);
+    font-weight: 900;
+    color: #d35400;
+    letter-spacing: 4px;
+    margin: 10px 0;
+    word-break: break-all;
+  }
+  .missing-slot {
+    display: inline-block;
+    min-width: 0.7em;
+    border-bottom: 5px solid #d35400;
+    color: #00b894;
+    margin: 0 2px;
+  }
+  .letter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .letter-btn {
+    background: #fff;
+    border: 3px solid #ff9f43;
+    border-radius: 14px;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #d35400;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #d97706;
+  }
+  .letter-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #d97706; }
+  .letter-btn.correct { background: #55efc4; border-color: #00b894; color: #0a6647; box-shadow: 0 4px 0 #00896a; }
+  .letter-btn.wrong { background: #ff7675; border-color: #d63031; color: #fff; box-shadow: 0 4px 0 #a82424; }
+  .letter-btn:disabled { cursor: default; }
+
+  /* ===== УРОВЕНЬ 6: СОБЕРИ СЛОВО ===== */
+  .built-word {
+    min-height: 70px;
+    background: #fff;
+    border: 3px dashed #d35400;
+    border-radius: 16px;
+    padding: 12px;
+    font-size: clamp(26px, 7vw, 38px);
+    font-weight: 800;
+    color: #d35400;
+    text-align: center;
+    letter-spacing: 4px;
+    margin-bottom: 14px;
+    word-break: break-all;
+  }
+  .tiles-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .tile {
+    background: #fff;
+    border: 3px solid #74b9ff;
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    font-weight: 800;
+    color: #2d3436;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #3a86c9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tile:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #3a86c9; }
+  .tile.used { opacity: 0.3; cursor: default; }
+  .tile.wrong-shake { animation: shake 0.4s; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); background: #ff7675; }
+    75% { transform: translateX(6px); background: #ff7675; }
+  }
+
+  /* ===== УРОВЕНЬ 7: ДИКТАНТ ===== */
+  .dictation-input {
+    width: 100%;
+    padding: 16px;
+    font-size: clamp(22px, 5vw, 28px);
+    font-weight: 700;
+    text-align: center;
+    border: 3px solid #d35400;
+    border-radius: 16px;
+    background: #fff;
+    color: #3a2e2a;
+    outline: none;
+    letter-spacing: 2px;
+  }
+  .dictation-input:focus { border-color: #ff9f43; box-shadow: 0 0 0 4px rgba(255,159,67,0.3); }
+  .dictation-input.correct { background: #55efc4; border-color: #00b894; }
+  .dictation-input.wrong { background: #ffdede; border-color: #d63031; }
+  .hint-text {
+    text-align: center;
+    font-size: 18px;
+    color: #7a5a4a;
+    margin-top: 8px;
+    min-height: 24px;
+    font-weight: 600;
+  }
+
+  /* ===== ФИНАЛЬНЫЙ ЭКРАН ===== */
+  .final-screen {
+    background: #fff;
+    border: 4px solid #d35400;
+    border-radius: 28px;
+    padding: 28px 20px;
+    text-align: center;
+    box-shadow: 0 6px 0 #a84400;
+  }
+  .final-emoji { font-size: 80px; line-height: 1; }
+  .final-title {
+    font-size: clamp(26px, 6vw, 36px);
+    font-weight: 900;
+    color: #d35400;
+    margin: 10px 0;
+  }
+  .final-score {
+    font-size: 20px;
+    color: #3a2e2a;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .final-stars {
+    font-size: 48px;
+    letter-spacing: 6px;
+    margin: 10px 0 18px;
+  }
+  .final-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+  .final-buttons .btn { min-width: 220px; }
+
+  /* ===== СООБЩЕНИЕ ОБ ОШИБКЕ ОЗВУЧКИ ===== */
+  .speech-warning {
+    background: #fff3cd;
+    border: 2px solid #f1c40f;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #856404;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  /* ===== АДАПТИВ ===== */
+  @media (max-width: 400px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .letter-btn { width: 54px; height: 54px; font-size: 24px; }
+    .tile { width: 42px; height: 42px; font-size: 20px; }
+  }
+  @media (min-width: 700px) {
+    .options-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ===== ГЛАВНОЕ МЕНЮ ===== -->
+  <section id="screen-menu" class="screen active">
+    <h1 class="title">🏠 My House</h1>
+    <p class="subtitle">Учим слова про дом</p>
+    <div class="levels-grid" id="levels-grid"></div>
+  </section>
+
+  <!-- ===== ЭКРАН УРОВНЯ (общий контейнер) ===== -->
+  <section id="screen-level" class="screen">
+    <div class="top-bar">
+      <button class="btn-back" onclick="goMenu()">← Меню</button>
+      <div class="progress-info" id="progress-info">1 / 10</div>
+      <div class="score-info" id="score-info">✅ 0</div>
+    </div>
+    <h2 class="level-title" id="level-title">Уровень</h2>
+    <div id="speech-warning-slot"></div>
+    <div id="level-content"></div>
+  </section>
+
+  <!-- ===== ФИНАЛЬНЫЙ ЭКРАН ===== -->
+  <section id="screen-final" class="screen">
+    <div class="final-screen">
+      <div class="final-emoji" id="final-emoji">🎉</div>
+      <h2 class="final-title" id="final-title">Молодец!</h2>
+      <p class="final-score" id="final-score">10 из 10</p>
+      <div class="final-stars" id="final-stars">⭐⭐⭐</div>
+      <div class="final-buttons">
+        <button class="btn success" onclick="replayLevel()">🔁 Пройти ещё раз</button>
+        <button class="btn" id="btn-next-level" onclick="nextLevel()">➡ Следующий уровень</button>
+        <button class="btn secondary" onclick="goMenu()">🏠 В меню</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* =========================================================
+   СПИСОК СЛОВ
+   ---------------------------------------------------------
+   Чтобы добавить слово — допиши новый объект в массив WORDS.
+   Чтобы удалить — убери объект из массива.
+   Чтобы изменить — поменяй значения внутри объекта.
+
+   Поля:
+     word       — слово на английском (обязательно)
+     translation— перевод на русский (обязательно)
+     definition — короткое определение на английском
+                  (простыми словами, для уровня starter)
+     emoji      — эмодзи-картинка (по желанию)
+   ========================================================= */
+const WORDS = [
+  { word: "tree house", translation: "домик на дереве", definition: "a house in a tree",      emoji: "🏡" },
+  { word: "table",      translation: "стол",            definition: "you eat on it",          emoji: "🪵" },
+  { word: "chair",      translation: "стул",            definition: "you sit on it",          emoji: "🪑" },
+  { word: "radio",      translation: "радио",           definition: "you listen to music",    emoji: "📻" },
+  { word: "bed",        translation: "кровать",         definition: "you sleep on it",        emoji: "🛏️" },
+  { word: "bath",       translation: "ванна",           definition: "you wash in it",         emoji: "🛁" }
+];
+
+/* =========================================================
+   НАСТРОЙКИ (можно менять под себя)
+   ========================================================= */
+// Возраст / класс (влияет на дизайн и подсказки)
+const AGE = 7;
+const GRADE = 2;
+// Правило возраста: если < 10 лет или 1–3 класс — используем ПЕРЕВОД, яркий дизайн.
+const USE_TRANSLATION = (AGE < 10) || (GRADE >= 1 && GRADE <= 3);
+
+// Настройки озвучки
+const SPEECH_LANG = "en-US";
+const SPEECH_RATE = AGE < 10 ? 0.75 : 0.85; // для младших — медленнее
+
+// Названия уровней
+const LEVEL_NAMES = [
+  "📖 Словарик",
+  "🔤 Слово → перевод",
+  "🔄 Перевод → слово",
+  "🔊 Аудио → слово",
+  "✏️ Пропущенная буква",
+  "🧩 Собери слово",
+  "🎧 Диктант"
+];
+
+/* =========================================================
+   СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+   ========================================================= */
+let state = {
+  currentLevel: 0,        // 1..7
+  queue: [],              // очередь слов для текущего уровня
+  currentIndex: 0,        // текущий номер вопроса
+  correctCount: 0,        // правильных ответов с первой попытки
+  mistakesCount: 0,       // всего ошибок
+  totalQuestions: 0,      // всего вопросов в уровне (включая повторения)
+  currentQuestion: null,  // данные текущего вопроса
+  showTranslation: true,  // для словарика
+  speechSupported: true,  // поддерживается ли озвучка
+  selectedVoice: null,    // выбранный голос
+  audioSequenceTimer: null // для "озвучить все подряд"
+};
+
+/* =========================================================
+   ХРАНИЛИЩЕ (localStorage) — звёзды по уровням
+   ========================================================= */
+const STORAGE_KEY = "myHouse_vocab_progress_v1";
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* хранилище недоступно — работаем без сохранения */ }
+  return { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0 };
+}
+function saveProgress(p) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p)); } catch (e) {}
+}
+let progress = loadProgress();
+
+/* =========================================================
+   УТИЛИТЫ
+   ========================================================= */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pickRandom(arr, n, exclude) {
+  // n случайных элементов из arr, без exclude
+  const pool = arr.filter(x => x !== exclude);
+  return shuffle(pool).slice(0, n);
+}
+
+/* =========================================================
+   ОЗВУЧКА (Web Speech API)
+   ========================================================= */
+function initSpeech() {
+  if (!('speechSynthesis' in window)) {
+    state.speechSupported = false;
+    return;
+  }
+  // Подбираем голос
+  const pickVoice = () => {
+    const voices = speechSynthesis.getVoices();
+    if (!voices.length) return;
+    // Приоритет: en-US женский, затем любой en-US, затем любой en
+    state.selectedVoice =
+      voices.find(v => v.lang === "en-US" && /female|samantha|zira|google us/i.test(v.name)) ||
+      voices.find(v => v.lang === "en-US") ||
+      voices.find(v => v.lang && v.lang.startsWith("en")) ||
+      voices[0];
+  };
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+function speak(text, onEnd) {
+  if (!state.speechSupported) {
+    if (onEnd) onEnd();
+    return;
+  }
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = SPEECH_LANG;
+    u.rate = SPEECH_RATE;
+    if (state.selectedVoice) u.voice = state.selectedVoice;
+    if (onEnd) u.onend = onEnd;
+    speechSynthesis.speak(u);
+  } catch (e) {
+    if (onEnd) onEnd();
+  }
+}
+function showSpeechWarning() {
+  const slot = document.getElementById("speech-warning-slot");
+  if (!state.speechSupported && slot) {
+    slot.innerHTML = '<div class="speech-warning">🔇 Озвучка не поддерживается в этом браузере. Учимся без звука!</div>';
+  } else if (slot) {
+    slot.innerHTML = '';
+  }
+}
+
+/* =========================================================
+   НАВИГАЦИЯ
+   ========================================================= */
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function goMenu() {
+  if (state.audioSequenceTimer) { clearTimeout(state.audioSequenceTimer); state.audioSequenceTimer = null; }
+  speechSynthesis && speechSynthesis.cancel && speechSynthesis.cancel();
+  showScreen("screen-menu");
+  renderMenu();
+}
+
+/* =========================================================
+   МЕНЮ: рендер карточек уровней
+   ========================================================= */
+function renderMenu() {
+  const grid = document.getElementById("levels-grid");
+  grid.innerHTML = "";
+  LEVEL_NAMES.forEach((name, i) => {
+    const lvl = i + 1;
+    const stars = progress[lvl] || 0;
+    const card = document.createElement("div");
+    card.className = "level-card";
+    card.onclick = () => startLevel(lvl);
+    card.innerHTML = `
+      <div class="level-num">${lvl}</div>
+      <div class="level-name">${name}</div>
+      <div class="level-stars">
+        ${[1,2,3].map(n => `<span class="${n <= stars ? '' : 'star-empty'}">⭐</span>`).join("")}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* =========================================================
+   ЗАПУСК УРОВНЯ
+   ========================================================= */
+function startLevel(lvl) {
+  state.currentLevel = lvl;
+  // Для уровней 5 и 6 исключаем слова с пробелами
+  if (lvl === 5 || lvl === 6) {
+    state.queue = shuffle(WORDS.filter(w => !w.word.includes(' ')));
+  } else {
+    state.queue = shuffle(WORDS.slice());
+  }
+  state.currentIndex = 0;
+  state.correctCount = 0;
+  state.mistakesCount = 0;
+  state.totalQuestions = state.queue.length;
+  showScreen("screen-level");
+  showSpeechWarning();
+  document.getElementById("level-title").textContent = LEVEL_NAMES[lvl - 1];
+  renderLevel();
+}
+function updateTopBar() {
+  const done = state.currentIndex;
+  const total = state.totalQuestions;
+  document.getElementById("progress-info").textContent = `${Math.min(done + 1, total)} / ${total}`;
+  document.getElementById("score-info").textContent = `✅ ${state.correctCount}`;
+}
+
+/* =========================================================
+   РЕНДЕР УРОВНЯ (диспетчер)
+   ========================================================= */
+function renderLevel() {
+  updateTopBar();
+  const lvl = state.currentLevel;
+  const content = document.getElementById("level-content");
+  if (state.queue.length === 0) {
+    finishLevel();
+    return;
+  }
+  const w = state.queue[0];
+  state.currentQuestion = w;
+  switch (lvl) {
+    case 1: renderLevel1(); break;
+    case 2: renderLevel2(); break;
+    case 3: renderLevel3(); break;
+    case 4: renderLevel4(); break;
+    case 5: renderLevel5(); break;
+    case 6: renderLevel6(); break;
+    case 7: renderLevel7(); break;
+  }
+}
+
+/* =========================================================
+   УРОВЕНЬ 1: СЛОВАРИК
+   ========================================================= */
+function renderLevel1() {
+  const content = document.getElementById("level-content");
+  // Скрываем верхнюю панель прогресса для словарика — он не игровой
+  document.getElementById("progress-info").style.display = "none";
+  document.getElementById("score-info").style.display = "none";
+
+  content.innerHTML = `
+    <div class="vocab-controls">
+      <button class="btn" onclick="speakAll()">🔊 Озвучить все</button>
+      <button class="btn secondary" onclick="toggleTranslation()">${state.showTranslation ? '🙈 Скрыть перевод' : '👀 Показать перевод'}</button>
+      <button class="btn success" onclick="finishLevel()">✅ Готово</button>
+    </div>
+    <div class="vocab-grid" id="vocab-grid"></div>
+  `;
+  const grid = document.getElementById("vocab-grid");
+  WORDS.forEach((w, i) => {
+    const card = document.createElement("div");
+    card.className = "word-card";
+    card.innerHTML = `
+      <button class="word-speak" onclick="event.stopPropagation(); speak('${w.word.replace(/'/g,"\\'")}')" aria-label="Озвучить">🔊</button>
+      <div class="word-emoji">${w.emoji || ''}</div>
+      <div class="word-text">${w.word}</div>
+      <div class="word-trans ${state.showTranslation ? '' : 'hidden'}">${w.translation}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+function toggleTranslation() {
+  state.showTranslation = !state.showTranslation;
+  renderLevel1();
+}
+function speakAll() {
+  if (state.audioSequenceTimer) { clearTimeout(state.audioSequenceTimer); state.audioSequenceTimer = null; }
+  let i = 0;
+  const playNext = () => {
+    if (i >= WORDS.length) return;
+    const w = WORDS[i];
+    speak(w.word, () => {
+      i++;
+      state.audioSequenceTimer = setTimeout(playNext, 400);
+    });
+  };
+  playNext();
+}
+
+/* =========================================================
+   УРОВЕНЬ 2: СЛОВО → ПЕРЕВОД (или дефиниция)
+   ========================================================= */
+function renderLevel2() {
+  const w = state.currentQuestion;
+  const distractors = pickRandom(WORDS, 3, w);
+  const options = shuffle([w, ...distractors]);
+  const content = document.getElementById("level-content");
+  content.innerHTML = `
+    <div class="question-box">
+      <div class="question-emoji">${w.emoji || ''}</div>
+      <div class="question-main">${w.word}</div>
+      <button class="btn" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 Послушать</button>
+    </div>
+    <div class="options-grid" id="options"></div>
+  `;
+  const opts = document.getElementById("options");
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.textContent = USE_TRANSLATION ? opt.translation : opt.definition;
+    btn.onclick = () => handleChoice2(btn, opt, w);
+    opts.appendChild(btn);
+  });
+}
+function handleChoice2(btn, chosen, correct) {
+  const allBtns = document.querySelectorAll("#options .option-btn");
+  allBtns.forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add("correct");
+    btn.innerHTML = btn.textContent + ' <span class="mark">✓</span>';
+    state.correctCount++;
+    nextQuestion();
+  } else {
+    btn.classList.add("wrong");
+    btn.innerHTML = btn.textContent + ' <span class="mark">✗</span>';
+    // Подсветим правильный
+    allBtns.forEach(b => {
+      const txt = USE_TRANSLATION ? correct.translation : correct.definition;
+      if (b.textContent.replace(' ✓','').replace(' ✗','') === txt) {
+        b.classList.add("correct");
+        b.innerHTML = b.textContent + ' <span class="mark">✓</span>';
+      }
+    });
+    state.mistakesCount++;
+    // Возвращаем слово в конец очереди
+    state.queue.push(state.queue.shift());
+    state.totalQuestions++;
+    setTimeout(nextQuestion, 1400);
+  }
+}
+
+/* =========================================================
+   УРОВЕНЬ 3: ПЕРЕВОД → СЛОВО (или ДЕФИНИЦИЯ → СЛОВО)
+   ========================================================= */
+function renderLevel3() {
+  const w = state.currentQuestion;
+  const distractors = pickRandom(WORDS, 3, w);
+  const options = shuffle([w, ...distractors]);
+  const content = document.getElementById("level-content");
+  const hint = USE_TRANSLATION ? w.translation : w.definition;
+  content.innerHTML = `
+    <div class="question-box">
+      <div class="question-emoji">${w.emoji || ''}</div>
+      <div class="question-main" style="font-size: clamp(22px,5vw,32px);">${hint}</div>
+    </div>
+    <div class="options-grid" id="options"></div>
+  `;
+  const opts = document.getElementById("options");
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerHTML = `${opt.emoji || ''} <span style="margin-left:6px">${opt.word}</span>`;
+    btn.onclick = () => handleChoice3(btn, opt, w);
+    opts.appendChild(btn);
+  });
+}
+function handleChoice3(btn, chosen, correct) {
+  const allBtns = document.querySelectorAll("#options .option-btn");
+  allBtns.forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add("correct");
+    btn.innerHTML = btn.innerHTML + ' <span class="mark">✓</span>';
+    state.correctCount++;
+    speak(correct.word);
+    nextQuestion();
+  } else {
+    btn.classList.add("wrong");
+    btn.innerHTML = btn.innerHTML + ' <span class="mark">✗</span>';
+    allBtns.forEach(b => {
+      if (b.innerHTML.includes(`>${correct.word}<`)) {
+        b.classList.add("correct");
+        b.innerHTML = b.innerHTML + ' <span class="mark">✓</span>';
+      }
+    });
+    state.mistakesCount++;
+    state.queue.push(state.queue.shift());
+    state.totalQuestions++;
+    setTimeout(nextQuestion, 1400);
+  }
+}
+
+/* =========================================================
+   УРОВЕНЬ 4: АУДИО → СЛОВО
+   ========================================================= */
+function renderLevel4() {
+  const w = state.currentQuestion;
+  const distractors = pickRandom(WORDS, 3, w);
+  const options = shuffle([w, ...distractors]);
+  const content = document.getElementById("level-content");
+  content.innerHTML = `
+    <div class="question-box">
+      <div class="question-emoji">🎧</div>
+      <div class="question-main">?</div>
+      <button class="btn" onclick="speak('${w.word.replace(/'/g,"\\'")}')" style="margin-top:10px">🔊 Повторить</button>
+    </div>
+    <div class="options-grid" id="options"></div>
+  `;
+  const opts = document.getElementById("options");
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "option-btn";
+    btn.innerHTML = `${opt.emoji || ''} <span style="margin-left:6px">${opt.word}</span>`;
+    btn.onclick = () => handleChoice4(btn, opt, w);
+    opts.appendChild(btn);
+  });
+  // Автовоспроизведение
+  setTimeout(() => speak(w.word), 200);
+}
+function handleChoice4(btn, chosen, correct) {
+  const allBtns = document.querySelectorAll("#options .option-btn");
+  allBtns.forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add("correct");
+    btn.innerHTML = btn.innerHTML + ' <span class="mark">✓</span>';
+    state.correctCount++;
+    nextQuestion();
+  } else {
+    btn.classList.add("wrong");
+    btn.innerHTML = btn.innerHTML + ' <span class="mark">✗</span>';
+    allBtns.forEach(b => {
+      if (b.innerHTML.includes(`>${correct.word}<`)) {
+        b.classList.add("correct");
+        b.innerHTML = b.innerHTML + ' <span class="mark">✓</span>';
+      }
+    });
+    state.mistakesCount++;
+    state.queue.push(state.queue.shift());
+    state.totalQuestions++;
+    setTimeout(nextQuestion, 1400);
+  }
+}
+
+/* =========================================================
+   УРОВЕНЬ 5: ПРОПУЩЕННАЯ БУКВА
+   ========================================================= */
+function getMissingIndex(word) {
+  // Для коротких слов — 2-я буква, иначе — случайная гласная, иначе случайная
+  if (word.length <= 4) return 1;
+  const vowels = "aeiouy";
+  const vowelIdxs = [];
+  for (let i = 1; i < word.length - 1; i++) {
+    if (vowels.includes(word[i].toLowerCase())) vowelIdxs.push(i);
+  }
+  if (vowelIdxs.length) return vowelIdxs[Math.floor(Math.random() * vowelIdxs.length)];
+  // Иначе случайная внутренняя
+  return 1 + Math.floor(Math.random() * (word.length - 2));
+}
+function renderLevel5() {
+  const w = state.currentQuestion;
+  const idx = getMissingIndex(w.word);
+  const correctLetter = w.word[idx];
+  // Генерируем 4 варианта букв (правильная + 3 случайные)
+  const alphabet = "abcdefghijklmnopqrstuvwxyz";
+  let letters = [correctLetter];
+  while (letters.length < 4) {
+    const l = alphabet[Math.floor(Math.random() * alphabet.length)];
+    if (!letters.includes(l)) letters.push(l);
+  }
+  letters = shuffle(letters);
+
+  const displayed = w.word.substring(0, idx) + '_' + w.word.substring(idx + 1);
+  const hint = USE_TRANSLATION ? w.translation : w.definition;
+
+  const content = document.getElementById("level-content");
+  content.innerHTML = `
+    <div class="question-box">
+      <div class="question-emoji">${w.emoji || ''}</div>
+      <div class="missing-word">${displayed.split('').map(c => c === '_' ? '<span class="missing-slot">&nbsp;</span>' : c).join('')}</div>
+      <div class="question-sub">${hint}</div>
+      <button class="btn" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 Послушать</button>
+      <div class="letter-options" id="letter-options"></div>
+    </div>
+  `;
+  const lo = document.getElementById("letter-options");
+  letters.forEach(l => {
+    const btn = document.createElement("button");
+    btn.className = "letter-btn";
+    btn.textContent = l;
+    btn.onclick = () => handleLetterChoice(btn, l, correctLetter, w, idx);
+    lo.appendChild(btn);
+  });
+}
+function handleLetterChoice(btn, chosen, correct, w, idx) {
+  const allBtns = document.querySelectorAll("#letter-options .letter-btn");
+  allBtns.forEach(b => b.disabled = true);
+  const slot = document.querySelector(".missing-slot");
+  if (chosen.toLowerCase() === correct.toLowerCase()) {
+    btn.classList.add("correct");
+    if (slot) slot.textContent = correct;
+    state.correctCount++;
+    speak(w.word);
+    setTimeout(nextQuestion, 1100);
+  } else {
+    btn.classList.add("wrong");
+    state.mistakesCount++;
+    state.queue.push(state.queue.shift());
+    state.totalQuestions++;
+    // Показать правильный
+    allBtns.forEach(b => {
+      if (b.textContent.toLowerCase() === correct.toLowerCase()) b.classList.add("correct");
+    });
+    if (slot) slot.textContent = correct;
+    setTimeout(nextQuestion, 1400);
+  }
+}
+
+/* =========================================================
+   УРОВЕНЬ 6: СОБЕРИ СЛОВО
+   ========================================================= */
+function renderLevel6() {
+  const w = state.currentQuestion;
+  const letters = shuffle(w.word.split(''));
+  const hint = USE_TRANSLATION ? w.translation : w.definition;
+
+  const content = document.getElementById("level-content");
+  content.innerHTML = `
+    <div class="question-box">
+      <div class="question-emoji">${w.emoji || ''}</div>
+      <div class="question-sub" style="margin-bottom:10px">${hint}</div>
+      <button class="btn" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 Послушать</button>
+    </div>
+    <div class="built-word" id="built-word">&nbsp;</div>
+    <div class="tiles-row" id="tiles-row"></div>
+    <div class="vocab-controls">
+      <button class="btn danger" onclick="eraseLetter()">🧽 Стереть букву</button>
+      <button class="btn secondary" onclick="restartLevel6()">🔄 Начать заново</button>
+    </div>
+  `;
+  const row = document.getElementById("tiles-row");
+  letters.forEach((l, i) => {
+    const t = document.createElement("button");
+    t.className = "tile";
+    t.textContent = l;
+    t.dataset.index = i;
+    t.onclick = () => pickTile(t, l);
+    row.appendChild(t);
+  });
+  state._built = [];
+  state._target = w.word;
+}
+function pickTile(tile, letter) {
+  if (tile.classList.contains("used")) return;
+  const pos = state._built.length;
+  const expected = state._target[pos];
+  if (letter.toLowerCase() === expected.toLowerCase()) {
+    state._built.push(letter);
+    tile.classList.add("used");
+    document.getElementById("built-word").textContent = state._built.join('');
+    if (state._built.length === state._target.length) {
+      state.correctCount++;
+      speak(state._target);
+      setTimeout(nextQuestion, 900);
+    }
+  } else {
+    tile.classList.add("wrong-shake");
+    setTimeout(() => tile.classList.remove("wrong-shake"), 400);
+  }
+}
+function eraseLetter() {
+  if (state._built.length === 0) return;
+  state._built.pop();
+  document.getElementById("built-word").textContent = state._built.length ? state._built.join('') : '\u00A0';
+  // Снимаем "used" с последней использованной плитки
+  const tiles = document.querySelectorAll("#tiles-row .tile");
+  let usedCount = 0;
+  tiles.forEach(t => { if (t.classList.contains("used")) usedCount++; });
+  // Находим последнюю used и снимаем
+  for (let i = tiles.length - 1; i >= 0; i--) {
+    if (tiles[i].classList.contains("used")) {
+      tiles[i].classList.remove("used");
+      break;
+    }
+  }
+}
+function restartLevel6() {
+  renderLevel6();
+}
+
+/* =========================================================
+   УРОВЕНЬ 7: ДИКТАНТ
+   ========================================================= */
+function renderLevel7() {
+  const w = state.currentQuestion;
+  const content = document.getElementById("level-content");
+  content.innerHTML = `
+    <div class="question-box">
+      <div class="question-emoji">🎧</div>
+      <div class="question-main">Напиши слово</div>
+      <div class="vocab-controls" style="margin-top:12px">
+        <button class="btn" onclick="speak('${w.word.replace(/'/g,"\\'")}')">🔊 Повторить</button>
+        <button class="btn secondary" onclick="showHint7()">💡 Подсказка</button>
+      </div>
+    </div>
+    <input type="text" class="dictation-input" id="dict-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="...">
+    <div class="hint-text" id="hint-text"></div>
+    <div class="vocab-controls" style="margin-top:14px">
+      <button class="btn success" onclick="checkDictation()">✅ Проверить</button>
+    </div>
+  `;
+  const input = document.getElementById("dict-input");
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") checkDictation();
+  });
+  setTimeout(() => input.focus(), 250);
+  setTimeout(() => speak(w.word), 300);
+}
+function showHint7() {
+  const w = state.currentQuestion;
+  document.getElementById("hint-text").textContent = "Первая буква: " + w.word[0].toUpperCase();
+}
+function checkDictation() {
+  const input = document.getElementById("dict-input");
+  const w = state.currentQuestion;
+  const val = input.value.trim().toLowerCase();
+  const target = w.word.trim().toLowerCase();
+  input.disabled = true;
+  if (val === target) {
+    input.classList.add("correct");
+    state.correctCount++;
+    speak(w.word);
+    setTimeout(nextQuestion, 1000);
+  } else {
+    input.classList.add("wrong");
+    state.mistakesCount++;
+    state.queue.push(state.queue.shift());
+    state.totalQuestions++;
+    document.getElementById("hint-text").textContent = "Правильно: " + w.word;
+    setTimeout(nextQuestion, 1800);
+  }
+}
+
+/* =========================================================
+   СЛЕДУЮЩИЙ ВОПРОС / ЗАВЕРШЕНИЕ
+   ========================================================= */
+function nextQuestion() {
+  state.queue.shift();
+  state.currentIndex++;
+  renderLevel();
+}
+function finishLevel() {
+  // Подсчёт звёзд
+  const total = state.totalQuestions;
+  const base = state.queue.length === 0 ? WORDS.length : state.queue.length;
+  const mistakes = state.mistakesCount;
+  let stars = 0;
+  if (total === base && mistakes === 0) stars = 3;
+  else if (mistakes <= 2) stars = 2;
+  else if (mistakes <= 4) stars = 1;
+  else stars = 1; // всё равно даём 1 за прохождение
+  if (state.correctCount === 0) stars = 0;
+
+  // Сохраняем лучший результат
+  if ((progress[state.currentLevel] || 0) < stars) {
+    progress[state.currentLevel] = stars;
+    saveProgress(progress);
+  }
+
+  // Рендер финального экрана
+  const emoji = stars === 3 ? "🏆" : stars === 2 ? "🎉" : stars === 1 ? "👍" : "💪";
+  const title = stars === 3 ? "Отлично!" : stars === 2 ? "Молодец!" : stars === 1 ? "Хорошо!" : "Попробуй ещё!";
+  document.getElementById("final-emoji").textContent = emoji;
+  document.getElementById("final-title").textContent = title;
+  document.getElementById("final-score").textContent = `Правильных с первой попытки: ${state.correctCount} из ${WORDS.length}`;
+  document.getElementById("final-stars").innerHTML =
+    [1,2,3].map(n => `<span class="${n <= stars ? '' : 'star-empty'}">⭐</span>`).join("");
+
+  // Кнопка "Следующий уровень" — скрыть если это последний
+  const nextBtn = document.getElementById("btn-next-level");
+  if (state.currentLevel >= 7) {
+    nextBtn.style.display = "none";
+  } else {
+    nextBtn.style.display = "";
+  }
+
+  showScreen("screen-final");
+}
+function replayLevel() {
+  startLevel(state.currentLevel);
+}
+function nextLevel() {
+  if (state.currentLevel < 7) startLevel(state.currentLevel + 1);
+  else goMenu();
+}
+
+/* =========================================================
+   СТАРТ
+   ========================================================= */
+window.addEventListener("DOMContentLoaded", () => {
+  initSpeech();
+  renderMenu();
+});
+// Разблокируем speechSynthesis по первому клику (ограничение браузеров)
+document.addEventListener("click", function unlock() {
+  if ('speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0;
+    try { speechSynthesis.speak(u); } catch(e) {}
+  }
+  document.removeEventListener("click", unlock);
+}, { once: true });
+</script>
+</body>
+</html>
